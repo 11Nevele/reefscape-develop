@@ -63,8 +63,6 @@ public class Elevator extends SubsystemBase {
     talon.setPosition(0);
     // Configure motor
     TalonFXConfiguration armTalonConfig = new TalonFXConfiguration();
-    armTalonConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
-    armTalonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     armTalonConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     armTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     armTalonConfig.Feedback.RotorToSensorRatio = 1; // ELEVATOR_GEAR_REDUCTION
@@ -75,13 +73,13 @@ public class Elevator extends SubsystemBase {
     // Move the arm
     armTalonConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     armTalonConfig.Slot0.kG = 0.3; // 0.35; // 0.35; // to hold the arm weight
-    armTalonConfig.Slot0.kP = 60; // 40; // 60; // 100; // adjust PID
+    armTalonConfig.Slot0.kP = 40; // 40; // 60; // 100; // adjust PID
     armTalonConfig.Slot0.kI = 0;
     armTalonConfig.Slot0.kD = 0;
     armTalonConfig.Slot0.kS = 0;
 
-    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 70; // 1.0; // 0.5;
-    armTalonConfig.MotionMagic.MotionMagicAcceleration = 10; // 2; // 1.0;
+    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 100; // 1.0; // 0.5;
+    armTalonConfig.MotionMagic.MotionMagicAcceleration = 30; // 2; // 1.0;
     armTalonConfig.MotionMagic.MotionMagicJerk = 0; // 10; // 10;
 
     pMmPos.Slot = 0;
