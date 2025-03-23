@@ -41,7 +41,7 @@ public class Wrist extends SubsystemBase {
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
   public static final double reduction =
-      75; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
+      45; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
   // horizontal
   public static final double minAngle = 90;
   public static final double maxAngle = 270;

@@ -1,3 +1,10 @@
+// Copyright (c) 2025 FRC 9785
+// https://github.com/tonytigr/reefscape
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -12,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class LimeLight extends SubsystemBase {
 
-  private final String limelightName = "limelight"; // Default name
+  private final String limelightName = ""; // Default name
   private static final double offset_side = -0.185;
   private static final double offset_forward = 0.42;
   private static final double offset_forward_level5 = 0.55;
@@ -45,11 +52,8 @@ public class LimeLight extends SubsystemBase {
   private static final Transform2d transform_right =
       new Transform2d(offset_forward, -offset_side, Rotation2d.fromDegrees(0));
 
+  public LimeLight() {
 
-  public LimeLight() 
-  {
-
-    
     // level 2,3
     APRILTAG_TARGET_POSE.put(
         "6L", TAG_LAYOUT.getTagPose(6).get().toPose2d().transformBy(transform_left));
@@ -109,13 +113,15 @@ public class LimeLight extends SubsystemBase {
         0, // Side offset (meters)
         0.10, // Height offset (meters)
         0.0, // Roll (degrees)
-        30.0, // Pitch (degrees)
+        35.0, // Pitch (degrees)
         180 // Yaw (degrees)
         );
   }
 
+  @Override
   public void periodic() {
-
+    limeLightInputs.target_x = getTx();
+    limeLightInputs.target_y = getTy();
     Logger.processInputs("LimeLight", limeLightInputs);
   }
 
@@ -153,11 +159,12 @@ public class LimeLight extends SubsystemBase {
   public Pose2d getTargetPose2D(boolean isLeft) {
     Pose2d targetPose = null;
     limeLightInputs.tagId = getTagID();
+    System.out.println(getTagID());
     if (limeLightInputs.tagId != 0) {
-        targetPose =
-            APRILTAG_TARGET_POSE.get(
-                limeLightInputs.tagId + (isLeft ? "L" : "R"));
+      targetPose = APRILTAG_TARGET_POSE.get(limeLightInputs.tagId + (isLeft ? "L" : "R"));
+
       if (targetPose == null) return null;
+
       limeLightInputs.target_r = targetPose.getRotation().getDegrees();
       limeLightInputs.target_x = targetPose.getX();
       limeLightInputs.target_y = targetPose.getY();

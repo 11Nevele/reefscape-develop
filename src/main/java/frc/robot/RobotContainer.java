@@ -7,11 +7,6 @@
 
 package frc.robot;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.ConstraintsZone;
@@ -22,7 +17,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PointTowardsZone;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -47,6 +41,9 @@ import frc.robot.subsystems.elevator.Wrist;
 import frc.robot.subsystems.intake.Shooter;
 import frc.robot.subsystems.vision.LimeLight;
 import frc.robot.subsystems.vision.LimelightHelpers;
+import java.util.Arrays;
+import java.util.List;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -223,9 +220,8 @@ public class RobotContainer {
 
     c_controller2.leftTrigger().onTrue(ElevatorWristCommands.setWristLevel(wrist, 5));
 
-
-    //elevator and wrist
-    controller
+    // elevator and wrist
+    /*controller
         .povDown()
         .onTrue(
             ElevatorWristCommands.setWristLevel(wrist, 0)
@@ -246,6 +242,11 @@ public class RobotContainer {
         .onTrue(
             ElevatorWristCommands.setWristLevel(wrist, 3)
                 .andThen(ElevatorWristCommands.setElevatorStage(elevator, 8)));
+    */
+    controller.povDown().onTrue(MoveToReeftarget(true, 1, 1));
+    controller.povLeft().onTrue(MoveToReeftarget(true, 2, 2));
+    controller.povUp().onTrue(MoveToReeftarget(false, 2, 2));
+    controller.povRight().onTrue(MoveToReeftarget(false, 1, 1));
 
     c_controller2
         .povDown()
@@ -272,55 +273,53 @@ public class RobotContainer {
     return autonomous;
   }
 
-  //Camera 
+  // Camera
 
-  public static PathPlannerPath createPath(Pose2d fromPose2d, Pose2d targetPose2d) 
-    {
+  public static PathPlannerPath createPath(Pose2d fromPose2d, Pose2d targetPose2d) {
 
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(fromPose2d, targetPose2d);
-        double velocity = 3;
-        double accelaration = 3;
-        
-        PathConstraints constraints =
-            new PathConstraints(
-                velocity, accelaration, 2 * Math.PI, 4 * Math.PI); // The constraints for this
-        // path.
-        // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
-        // You can also use unlimited constraints, only limited by motor torque and
-        // nominal battery voltage
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(fromPose2d, targetPose2d);
+    double velocity = 3;
+    double accelaration = 3;
 
-        List<EventMarker> ListEM = Arrays.asList();
-        List<RotationTarget> ListRT = Arrays.asList();
-        List<ConstraintsZone> ListCZ = Arrays.asList();
-        List<PointTowardsZone> ListPTZ = Arrays.asList();
+    PathConstraints constraints =
+        new PathConstraints(
+            velocity, accelaration, 2 * Math.PI, 4 * Math.PI); // The constraints for this
+    // path.
+    // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); //
+    // You can also use unlimited constraints, only limited by motor torque and
+    // nominal battery voltage
 
-        // Create the path using the waypoints created above
-        PathPlannerPath path =
-            new PathPlannerPath(
-                waypoints,
-                ListRT,
-                ListPTZ,
-                ListCZ,
-                ListEM,
-                constraints,
-                null, // The ideal starting state, this is only relevant for pre-planned paths, so can
-                // be null for on-the-fly paths.
-                new GoalEndState(
-                    0.0,
-                    targetPose2d
-                        .getRotation()), // Goal end state. You can set a holonomic rotation here. If
-                // using a differential drivetrain, the rotation will have no
-                // effect.
-                false);
+    List<EventMarker> ListEM = Arrays.asList();
+    List<RotationTarget> ListRT = Arrays.asList();
+    List<ConstraintsZone> ListCZ = Arrays.asList();
+    List<PointTowardsZone> ListPTZ = Arrays.asList();
 
-        // Prevent the path from being flipped if the coordinates are already correct
-        path.preventFlipping = true;
+    // Create the path using the waypoints created above
+    PathPlannerPath path =
+        new PathPlannerPath(
+            waypoints,
+            ListRT,
+            ListPTZ,
+            ListCZ,
+            ListEM,
+            constraints,
+            null, // The ideal starting state, this is only relevant for pre-planned paths, so can
+            // be null for on-the-fly paths.
+            new GoalEndState(
+                0.0,
+                targetPose2d
+                    .getRotation()), // Goal end state. You can set a holonomic rotation here. If
+            // using a differential drivetrain, the rotation will have no
+            // effect.
+            false);
 
-        return path;
+    // Prevent the path from being flipped if the coordinates are already correct
+    path.preventFlipping = true;
+
+    return path;
   }
 
-  public static  PathPlannerPath GoReefTarget(Drive drive, LimeLight vision, boolean isLeft) 
-  {
+  public static PathPlannerPath GoReefTarget(Drive drive, LimeLight vision, boolean isLeft) {
 
     if (LimelightHelpers.getTV("limelight")) { // set position based on limelight
       drive.setPose(LimelightHelpers.getBotPose2d_wpiBlue("limelight"));
@@ -337,24 +336,25 @@ public class RobotContainer {
   }
 
   Command cmd;
-  public Command MoveToReeftarget(boolean isLeft, int elevatorLevel, int wristLevel)
-  {
+
+  public Command MoveToReeftarget(boolean isLeft, int elevatorLevel, int wristLevel) {
     return new InstantCommand(
-        ()->{
-            var path = GoReefTarget(drive, vision, isLeft);
-            if (path != null) 
-            {
+            () -> {
+              var path = GoReefTarget(drive, vision, isLeft);
+              System.out.println("Tracking start");
+              if (path != null) {
+                System.out.println("path found");
                 cmd = AutoBuilder.followPath(path);
                 drive.isTracking = true;
                 cmd.schedule();
-            }
-        })
+              }
+            })
         .alongWith(ElevatorWristCommands.setElevatorStage(elevator, elevatorLevel))
         .alongWith(ElevatorWristCommands.setWristLevel(wrist, wristLevel))
-        .andThen(new InstantCommand(
-            ()->{
-                drive.isTracking = false;
-            }
-        ));
+        .andThen(
+            new InstantCommand(
+                () -> {
+                  drive.isTracking = false;
+                }));
   }
 }
