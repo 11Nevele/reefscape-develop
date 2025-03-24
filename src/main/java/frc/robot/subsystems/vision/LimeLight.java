@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class LimeLight extends SubsystemBase {
 
-  private final String limelightName = ""; // Default name
+  private final String limelightName = "limelight-front"; // Default name
   private static final double offset_side = -0.185;
   private static final double offset_forward = 0.42;
   private static final double offset_forward_level5 = 0.55;
