@@ -363,4 +363,8 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
+
+  public void resetPos() {
+    poseEstimator.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  }
 }

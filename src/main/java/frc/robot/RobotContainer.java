@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -178,6 +179,9 @@ public class RobotContainer {
     controller.leftBumper().onFalse(IntakeCommands.stop(wrist));
     controller.leftTrigger().onTrue(IntakeCommands.outake(wrist));
     controller.leftTrigger().onFalse(IntakeCommands.stop(wrist));
+
+    controller.a().onTrue(Commands.runOnce(() -> drive.resetPos()));
+
     /*
      * // manuel elevator
      * c_controller2.x().onTrue(ElevatorWristCommands.moveElevator(elevator, 0.5));
@@ -243,10 +247,10 @@ public class RobotContainer {
             ElevatorWristCommands.setWristLevel(wrist, 3)
                 .andThen(ElevatorWristCommands.setElevatorStage(elevator, 8)));
     */
-    controller.povDown().onTrue(MoveToReeftarget(true, 1, 1));
-    controller.povLeft().onTrue(MoveToReeftarget(true, 2, 2));
+    controller.povDown().onTrue(MoveToReeftarget(true, 0, 0));
+    controller.povLeft().onTrue(MoveToReeftarget(true, 1, 1));
     controller.povUp().onTrue(MoveToReeftarget(false, 2, 2));
-    controller.povRight().onTrue(MoveToReeftarget(false, 1, 1));
+    controller.povRight().onTrue(MoveToReeftarget(false, 8, 3));
 
     c_controller2
         .povDown()
