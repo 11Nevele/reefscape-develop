@@ -25,8 +25,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.SuperStructureState;
 import frc.robot.generated.TunerConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
@@ -41,12 +41,13 @@ public class Wrist extends SubsystemBase {
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
   public static final double reduction =
-      75; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
+      45; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
   // horizontal
-  public static final double minAngle = -150;
-  public static final double maxAngle = -100;
+  public static final double minAngle = 90;
+  public static final double maxAngle = 270;
 
-  double targetDegrees = SuperStructureState.SOURCE_ANGLE;
+  double targetDegrees = minAngle;
+  private boolean manuelMoving = false;
 
   @AutoLog
   public static class WristIOInputs {
@@ -54,13 +55,14 @@ public class Wrist extends SubsystemBase {
     public boolean encoderConnected = false;
     public double targetAngle = 0.0;
     public double currentAngle = 0.0;
+    public boolean manuelMoving = false;
   }
 
   public final WristIOInputsAutoLogged pivotInputs = new WristIOInputsAutoLogged();
 
   public Wrist() {
     talon = new TalonFX(16, TunerConstants.kCANBus);
-    wristIntake = new TalonFX(17, TunerConstants.kCANBus);
+    wristIntake = new TalonFX(19, TunerConstants.kCANBus);
     // DigitalInput input = new DigitalInput(9);
     // wristEncoder = new DutyCycleEncoder(input);
 
@@ -68,7 +70,7 @@ public class Wrist extends SubsystemBase {
     TalonFXConfiguration armTalonConfig = new TalonFXConfiguration();
     armTalonConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
     armTalonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    armTalonConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    armTalonConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     armTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     armTalonConfig.Feedback.SensorToMechanismRatio = reduction;
     armTalonConfig.Feedback.RotorToSensorRatio = 1;
@@ -77,10 +79,10 @@ public class Wrist extends SubsystemBase {
 
     // Move the arm
     armTalonConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    armTalonConfig.Slot0.kG = 0.35; // 0.35; // to hold the arm weight
-    armTalonConfig.Slot0.kP = 40; // 60; // 100; // adjust PID
+    armTalonConfig.Slot0.kG = 0.1; // 0.35; // to hold the arm weight
+    armTalonConfig.Slot0.kP = 50; // 60; // 100; // adjust PID
     armTalonConfig.Slot0.kI = 0;
-    armTalonConfig.Slot0.kD = 0.01;
+    armTalonConfig.Slot0.kD = 1;
     armTalonConfig.Slot0.kS = 0;
     armTalonConfig.Slot0.kV = 5; // 8.3; // move velocity
     armTalonConfig.Slot0.kA = 0.15; // 0.2; // move accerleration
@@ -95,7 +97,6 @@ public class Wrist extends SubsystemBase {
     // Set up armTalonConfig
     talon.getConfigurator().apply(armTalonConfig, 0.25);
     wristIntake.getConfigurator().apply(armTalonConfig, 0.25);
-
     // ParentDevice.optimizeBusUtilizationForAll(talon, wristEncoder);
   }
 
@@ -103,13 +104,16 @@ public class Wrist extends SubsystemBase {
     return pivotInputs.currentAngle < 80;
   }
 
+  @Override
   public void periodic() {
+    pivotInputs.manuelMoving = manuelMoving;
     pivotInputs.encoderConnected = false;
     pivotInputs.motorConnected = talon.isConnected();
     pivotInputs.targetAngle = targetDegrees;
     pivotInputs.currentAngle = getAngle();
     Logger.processInputs("Wrist", pivotInputs);
-    talon.setControl(pMmPos.withPosition(Units.degreesToRotations(targetDegrees)));
+    if (!manuelMoving)
+      talon.setControl(pMmPos.withPosition(Units.degreesToRotations(targetDegrees + 1)));
     if (DriverStation.isDisabled()) {
       talon.setControl(new NeutralOut());
     }
@@ -122,10 +126,18 @@ public class Wrist extends SubsystemBase {
 
   public void moveWrist(double moveWrist) {
     if (moveWrist == 0) {
+      manuelMoving = false;
       talon.set(0);
       talon.stopMotor();
     } else {
-      talon.set(moveWrist);
+      manuelMoving = true;
+      if (pivotInputs.currentAngle <= maxAngle + 15 && pivotInputs.currentAngle >= minAngle - 15) {
+        talon.set(moveWrist);
+      } else if (pivotInputs.currentAngle >= maxAngle) {
+        talon.set(-0.1);
+      } else if (pivotInputs.currentAngle <= minAngle) {
+        talon.set(0.1);
+      }
     }
   }
 
@@ -144,6 +156,15 @@ public class Wrist extends SubsystemBase {
     }
   }
 
+  public void intakeSpeed(double speed) {
+    if (speed > 0) { // Intake Coral
+      SmartDashboard.putBoolean("Coral Intake", true);
+    } else if (speed < 0) { // Outake Coral
+      SmartDashboard.putBoolean("Coral Intake", false);
+    }
+    wristIntake.set(speed);
+  }
+
   public void setWristAngle(double setPointAngle) {
     targetDegrees = MathUtil.clamp(setPointAngle, minAngle, maxAngle);
   }
@@ -151,5 +172,9 @@ public class Wrist extends SubsystemBase {
   public BooleanSupplier isDone() {
     boolean flag = Math.abs(targetDegrees - pivotInputs.currentAngle) < 3;
     return () -> flag;
+  }
+
+  public void zeroWrist() {
+    targetDegrees = 0;
   }
 }

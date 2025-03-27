@@ -7,45 +7,121 @@
 
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.HashMap;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class LimeLight extends SubsystemBase {
 
-  private final String limelightName = "limelight"; // Default name
-  PIDController rotatePid = new PIDController(0.125, 0, 0);
-  PIDController xPid = new PIDController(1, 0, 0.005);
-  PIDController yPid = new PIDController(0.0605, 0, 0.0055);
+  private final String limelightName = "limelight-front"; // Default name
+  private static final double offset_side = -0.185;
+  private static final double offset_forward = 0.42;
 
   // private final AprilTagFieldLayout APRILTAGFIELDLAYOUT =
-  //     AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+  public static final AprilTagFieldLayout TAG_LAYOUT =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-  //  AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  // AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
   // meter up from center.
   @AutoLog
   public static class LimeLightIOInputs {
-    public double pitch = 0;
-    public double yaw = 0;
-    public double distance = 0;
+    public int tagId = 0;
+
+    public double current_r = 0;
+    public double current_x = 0;
+    public double current_y = 0;
+    public double target_r = 0;
+    public double target_x = 0;
+    public double target_y = 0;
   }
 
   private LimeLightIOInputsAutoLogged limeLightInputs = new LimeLightIOInputsAutoLogged();
 
-  private final double CAMERA_HEIGHT = 0.28;
-  private final double REEF_TARGET = 0.22;
-  private final double CAMERA_PITCH = 0;
+  public final HashMap<String, Pose2d> APRILTAG_TARGET_POSE = new HashMap<String, Pose2d>();
 
-  public LimeLight() {}
+  private static final Transform2d transform_left =
+      new Transform2d(offset_forward, offset_side, Rotation2d.fromDegrees(0));
+  private static final Transform2d transform_right =
+      new Transform2d(offset_forward, -offset_side, Rotation2d.fromDegrees(0));
 
+  public LimeLight() {
+
+    // level 2,3
+    APRILTAG_TARGET_POSE.put(
+        "6L", TAG_LAYOUT.getTagPose(6).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "7L", TAG_LAYOUT.getTagPose(7).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "8L", TAG_LAYOUT.getTagPose(8).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "9L", TAG_LAYOUT.getTagPose(9).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "10L", TAG_LAYOUT.getTagPose(10).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "11L", TAG_LAYOUT.getTagPose(11).get().toPose2d().transformBy(transform_left));
+
+    APRILTAG_TARGET_POSE.put(
+        "17L", TAG_LAYOUT.getTagPose(17).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "18L", TAG_LAYOUT.getTagPose(18).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "19L", TAG_LAYOUT.getTagPose(19).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "20L", TAG_LAYOUT.getTagPose(20).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "21L", TAG_LAYOUT.getTagPose(21).get().toPose2d().transformBy(transform_left));
+    APRILTAG_TARGET_POSE.put(
+        "22L", TAG_LAYOUT.getTagPose(22).get().toPose2d().transformBy(transform_left));
+
+    APRILTAG_TARGET_POSE.put(
+        "6R", TAG_LAYOUT.getTagPose(6).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "7R", TAG_LAYOUT.getTagPose(7).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "8R", TAG_LAYOUT.getTagPose(8).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "9R", TAG_LAYOUT.getTagPose(9).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "10R", TAG_LAYOUT.getTagPose(10).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "11R", TAG_LAYOUT.getTagPose(11).get().toPose2d().transformBy(transform_right));
+
+    APRILTAG_TARGET_POSE.put(
+        "17R", TAG_LAYOUT.getTagPose(17).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "18R", TAG_LAYOUT.getTagPose(18).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "19R", TAG_LAYOUT.getTagPose(19).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "20R", TAG_LAYOUT.getTagPose(20).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "21R", TAG_LAYOUT.getTagPose(21).get().toPose2d().transformBy(transform_right));
+    APRILTAG_TARGET_POSE.put(
+        "22R", TAG_LAYOUT.getTagPose(22).get().toPose2d().transformBy(transform_right));
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        limelightName,
+        0.10, // Forward offset (meters)
+        0, // Side offset (meters)
+        0.10, // Height offset (meters)
+        0.0, // Roll (degrees)
+        0.0, // Pitch (degrees)
+        0.0 // Yaw (degrees)
+        );
+  }
+
+  @Override
   public void periodic() {
-    limeLightInputs.pitch = getTy();
-    limeLightInputs.yaw = getTx();
-    limeLightInputs.distance = getDistance();
+    // limeLightInputs.current_r = getRobotPose().getRotation().getDegrees();
+    // limeLightInputs.current_x = getRobotPose().getX();
+    // limeLightInputs.current_y = getRobotPose().getY();
     Logger.processInputs("LimeLight", limeLightInputs);
   }
 
@@ -71,48 +147,32 @@ public class LimeLight extends SubsystemBase {
 
   /** Get the AprilTag ID */
   public int getTagID() {
-    return (int) LimelightHelpers.getFiducialID(limelightName);
+    int tagId = (int) LimelightHelpers.getFiducialID(limelightName);
+    return tagId;
   }
 
   /** Get estimated robot pose from the Limelight */
-  public Pose3d getRobotPose() {
-    return LimelightHelpers.getBotPose3d_wpiBlue(limelightName);
+  public Pose2d getRobotPose() {
+    return LimelightHelpers.getBotPose2d_wpiBlue(limelightName);
   }
 
-  //
-  public double getDistance() {
-    double ty = getTy();
-    double angleRadian = Units.degreesToRadians(CAMERA_PITCH + ty);
+  public Pose2d getTargetPose2D(boolean isLeft) {
+    Pose2d targetPose = null;
+    limeLightInputs.tagId = getTagID();
+    System.out.println(getTagID());
+    if (limeLightInputs.tagId != 0) {
+      targetPose = APRILTAG_TARGET_POSE.get(limeLightInputs.tagId + (isLeft ? "L" : "R"));
+      System.out.println(limeLightInputs.tagId + (isLeft ? "L" : "R"));
+      if (targetPose == null) return null;
 
-    if (Math.abs(angleRadian) < 1e-6) return Double.MAX_VALUE; // Prevent unreliable distances
-
-    return (REEF_TARGET - CAMERA_HEIGHT) / Math.tan(angleRadian);
-  }
-
-  public double autoRotate() {
-
-    return getTx();
-  }
-
-  public double autoTranslateX() {
-    double correction =
-        -xPid.calculate(getDistance() * Math.sin(Units.degreesToRadians(getTx())), 0);
-    System.out.println("X: " + correction);
-    if (hasTarget()) {
-      return correction;
-    } else {
-      return 0;
+      limeLightInputs.target_r = targetPose.getRotation().getDegrees();
+      limeLightInputs.target_x = targetPose.getX();
+      limeLightInputs.target_y = targetPose.getY();
+      limeLightInputs.current_r = getRobotPose().getRotation().getDegrees();
+      limeLightInputs.current_x = getRobotPose().getX();
+      limeLightInputs.current_y = getRobotPose().getY();
     }
-  }
 
-  public double autoTranslateY() {
-    double correction =
-        -yPid.calculate(getDistance() * Math.cos(Units.degreesToRadians(getTx())), 10);
-    System.out.println("Y: " + correction);
-    if (hasTarget()) {
-      return correction;
-    } else {
-      return 0;
-    }
+    return targetPose;
   }
 }

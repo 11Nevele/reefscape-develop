@@ -9,16 +9,23 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.elevator.Wrist;
+import frc.robot.subsystems.elevator.Funnel;
 
-public class CoralCommands {
-  private CoralCommands() {}
+public class FunnelCommands {
 
-  public static Command moveIntake(Wrist wrist) {
-    return Commands.run(
+  public static Command FunnelUp(Funnel funnel) {
+    return Commands.runOnce(
         () -> {
-          wrist.moveIntake(1);
+          funnel.setWristAngle(80);
         },
-        wrist);
+        funnel);
+  }
+
+  public static Command FunnelDown(Funnel funnel) {
+    return Commands.runOnce(
+        () -> {
+          funnel.setWristAngle(20);
+        },
+        funnel);
   }
 }

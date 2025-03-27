@@ -7,20 +7,16 @@
 
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.generated.ShooterConstants;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.AutoLog;
 
 public class Shooter extends SubsystemBase {
-  private final SparkMax leftTransfer;
-  private final SparkMax rightTransfer;
-
-  private final SparkMax leftIntake;
-  private final SparkMax rightIntake;
+  private final TalonFX transferMoter;
 
   private final TalonFX leftShooter;
   private final TalonFX rightShooter;
@@ -34,11 +30,15 @@ public class Shooter extends SubsystemBase {
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   public Shooter() {
-    leftTransfer = new SparkMax(4, MotorType.kBrushless);
-    rightTransfer = new SparkMax(2, MotorType.kBrushless);
+    transferMoter = new TalonFX(17, TunerConstants.kCANBus);
 
-    leftIntake = new SparkMax(5, MotorType.kBrushless);
-    rightIntake = new SparkMax(3, MotorType.kBrushless);
+    TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
+    shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    shooterConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
+    shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    transferMoter.getConfigurator().apply(shooterConfig);
 
     rightShooter = new TalonFX(13, TunerConstants.kCANBus);
     leftShooter = new TalonFX(14, TunerConstants.kCANBus);
@@ -52,44 +52,34 @@ public class Shooter extends SubsystemBase {
 
   public void shoot(boolean moveShooter) {
     if (moveShooter) {
-      rightShooter.setVoltage(-ShooterConstants.shooterVoltage);
-      leftShooter.setVoltage(ShooterConstants.shooterVoltage);
+      rightShooter.set(-1);
+      leftShooter.set(1);
     } else {
-
       rightShooter.setVoltage(0);
       leftShooter.setVoltage(0);
     }
   }
 
+  public void shootRev(boolean moveShooter) {
+    if (moveShooter) {
+      rightShooter.set(0.5);
+      leftShooter.set(-0.5);
+    } else {
+      rightShooter.setVoltage(0);
+      leftShooter.setVoltage(0);
+    }
+  }
+
+  public void transferSpeed(double speed) {
+    transferMoter.set(speed * 0.3);
+  }
+
   public void transfer(boolean moveTransfer) {
     if (moveTransfer) {
-      rightTransfer.set(-0.25);
-      leftTransfer.set(0.25);
+      transferMoter.set(0.25);
     } else {
-      leftTransfer.set(0);
-      rightTransfer.set(0);
-      leftTransfer.stopMotor();
-      rightTransfer.stopMotor();
+      transferMoter.set(0);
+      transferMoter.stopMotor();
     }
-  }
-
-  public void intake(double moveTransfer) {
-    if (moveTransfer == 1) {
-      rightIntake.set(-1);
-      leftIntake.set(1);
-    } else if (moveTransfer == -1) {
-      rightIntake.set(1);
-      leftIntake.set(-1);
-    } else {
-      leftIntake.set(0);
-      rightIntake.set(0);
-      leftIntake.stopMotor();
-      rightIntake.stopMotor();
-    }
-  }
-
-  public void intakeMove(double speed) {
-    rightIntake.set(-1);
-    leftIntake.set(1);
   }
 }

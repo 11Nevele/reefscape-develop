@@ -7,24 +7,33 @@
 
 package frc.robot;
 
+// L1 13
+// L2 42.5
+
+// Algea L1
 public class SuperStructureState {
 
   public static final double SOURCE_HEIGHT = 0.25;
   public static final double SOURCE_ANGLE = 50;
 
-  public static final double L0_HEIGHT = 0;
-  public static final double L1_HEIGHT = 5.5; // Down //Ground intake
-  public static final double L2_HEIGHT = 18; // Left //Transfer
-  public static final double L3_HEIGHT = 45; // Up
-  public static final double L4_HEIGHT = 72; // Right
-  public static final double TRANSFER_HEIGHT = 12; // Right
+  public static final double L0_HEIGHT = 0.1;
+  public static final double L1_HEIGHT = 23.35; // L2 Coral
+  public static final double L2_HEIGHT = 40; // L2 Algea
+  public static final double L3_HEIGHT = 0; // L3 Coral
+  public static final double L4_HEIGHT = 0; // L3 Algea
+  public static final double HUMAN_HEIGHT = 15.8; // Right //Transfer
+  public static final double L1B_HEIGHT = 30; // L1 Outake
+  public static final double L2B_HEIGHT = 52; // L2 Outake
 
-  public static final double L0_ANGLE = -100;
-  public static final double L1_ANGLE = -100;
-  public static final double L2_ANGLE = -100;
-  public static final double L3_ANGLE = -100;
-  public static final double L4_ANGLE = -100;
-  public static final double TRANSFER_ANGLE = -100;
+  // intake 35
+  public static final double L0_ANGLE = -45;
+  public static final double L1_ANGLE = -30;
+  public static final double L2_ANGLE = 10;
+  public static final double L3_ANGLE = -30;
+  public static final double L4_ANGLE = 10;
+  public static final double HUMAN_ANGLE = -100;
+  public static final double L1B_ANGLE = -100;
+  public static final double L2B_ANGLE = -100;
 
   public static final double PROCESSOR_HEIGHT = 5;
   public static final double LOW_ALGAE_HEIGHT = 25;
@@ -45,8 +54,12 @@ public class SuperStructureState {
   public static SuperStructureState STATE_L2 = new SuperStructureState("CL2", L2_HEIGHT, L2_ANGLE);
   public static SuperStructureState STATE_L3 = new SuperStructureState("CL3", L3_HEIGHT, L3_ANGLE);
   public static SuperStructureState STATE_L4 = new SuperStructureState("CL4", L4_HEIGHT, L4_ANGLE);
-  public static SuperStructureState STATE_TRANSFER =
-      new SuperStructureState("CLT", TRANSFER_HEIGHT, TRANSFER_ANGLE);
+  public static SuperStructureState STATE_HUMAN =
+      new SuperStructureState("CLT", HUMAN_HEIGHT, HUMAN_ANGLE);
+  public static SuperStructureState STATE_L1B =
+      new SuperStructureState("CL1B", L1B_HEIGHT, L1B_ANGLE);
+  public static SuperStructureState STATE_L2B =
+      new SuperStructureState("CL2B", L2B_HEIGHT, L2B_ANGLE);
 
   public static SuperStructureState STATE_PROCESSOR =
       new SuperStructureState("PROCESSOR", PROCESSOR_HEIGHT, PROCESSOR_ANGLE);

@@ -10,8 +10,11 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.ElevatorWristCommands;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,7 +31,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
-  private RobotContainer robotContainer;
+  private final RobotContainer robotContainer;
 
   public Robot() {
     // Record metadata
@@ -95,67 +98,25 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
   }
 
-  double curAngle = 0;
-
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
     // Optionally switch the thread to high priority to improve loop
     // timing (see the template project documentation for details)
     // Threads.setCurrentThreadPriority(true, 99);
-
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
-    // robotContainer.intake.intake(robotContainer.m_controller.getAButton());
-    if (robotContainer.m_controller.getRightTriggerAxis() > 0.01) {
-      robotContainer.shooter.shoot(true);
-    } else {
-      robotContainer.shooter.shoot(false);
+    ElevatorWristCommands.moveWrist(robotContainer.wrist, robotContainer.controller2.getLeftY());
+    ElevatorWristCommands.moveElevator(
+        robotContainer.elevator, robotContainer.controller2.getRightY());
+    SmartDashboard.putNumber("Remaining Time", 150 - DriverStation.getMatchTime());
+    if (150 - DriverStation.getMatchTime() < 5) {
+      SmartDashboard.putString("Current Action", "PARK");
     }
-    robotContainer.shooter.shoot(robotContainer.m_controller.getRightBumperButton());
-
-    if (robotContainer.m_controller.getLeftTriggerAxis() > 0.01) {
-      robotContainer.shooter.intake(1);
-    } else if (robotContainer.m_controller.getLeftBumperButton()) {
-      robotContainer.shooter.intake(-1);
-    } else {
-      robotContainer.shooter.intake(0);
-    }
-
-    if (robotContainer.m_controller.getXButton()) { // Up
-      curAngle += 3;
-      robotContainer.wrist.setWristAngle(curAngle);
-    } else if (robotContainer.m_controller.getYButton()) {
-      curAngle -= 3;
-      robotContainer.wrist.setWristAngle(curAngle);
-    } else {
-      robotContainer.wrist.setWristAngle(curAngle);
-    }
-
-    if (robotContainer.m_controller.getAButton()) { // Intake
-      robotContainer.wrist.moveIntake(1);
-    } else if (robotContainer.m_controller.getBButton()) {
-      robotContainer.wrist.moveIntake(-1);
-    } else {
-      robotContainer.wrist.moveIntake(0);
-    }
-    if (robotContainer.m_controller.getRightTriggerAxis() > 0.05) {
-      robotContainer.shooter.transfer(true);
-    } else {
-      robotContainer.shooter.transfer(false);
-    }
-
-    robotContainer.shooter.shoot(robotContainer.m_controller.getRightBumperButton());
-    // if (robotContainer.m_controller.getRightBumperButtonPressed())
-    // robotContainer.elevator.stop();
-    // int t = robotContainer.m_controller.getPOV();
-    // System.out.println(t);
-    // robotContainer.elevator.setElevatorHeight(15);
   }
 
   /** This function is called once when the robot is disabled. */
@@ -219,4 +180,12 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  public boolean isXPressed() {
+    return robotContainer.m_controller.getXButton();
+  }
+
+  public boolean isYPressed() {
+    return robotContainer.m_controller.getYButton();
+  }
 }

@@ -13,7 +13,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -22,6 +21,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SuperStructureState;
 import frc.robot.generated.TunerConstants;
@@ -35,7 +35,7 @@ public class Elevator extends SubsystemBase {
       Units.inchesToMeters(2.472433418375167278670100342641) * 100; // inches
   private static final double POS_SWITCH_THRESHOLD = 2;
   public static final double minHeight = 0;
-  public static final double maxHeight = 801.5;
+  public static final double maxHeight = 60;
 
   double targetHeight = SuperStructureState.SOURCE_HEIGHT;
 
@@ -43,7 +43,6 @@ public class Elevator extends SubsystemBase {
   private final TalonFX talon;
   private final TalonFX followerTalon;
 
-  PositionVoltage pPos = new PositionVoltage(0);
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
   @AutoLog
@@ -54,6 +53,7 @@ public class Elevator extends SubsystemBase {
     public double elevatorHeight = 0;
   }
 
+  private boolean manuelMoving = false;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public Elevator() {
@@ -63,46 +63,38 @@ public class Elevator extends SubsystemBase {
     talon.setPosition(0);
     // Configure motor
     TalonFXConfiguration armTalonConfig = new TalonFXConfiguration();
-    armTalonConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
-    armTalonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    armTalonConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    armTalonConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     armTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     armTalonConfig.Feedback.RotorToSensorRatio = 1; // ELEVATOR_GEAR_REDUCTION
     armTalonConfig.Feedback.SensorToMechanismRatio = ELEVATOR_GEAR_REDUCTION;
 
     armTalonConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.2;
-    // Hold the ARM
-    armTalonConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-    armTalonConfig.Slot1.kG = 0.3; // 0.35; // 0.35; // to hold the arm weight
-    armTalonConfig.Slot1.kP = 10; // 40; // 60; // 60; // 100; // adjust PID
-    armTalonConfig.Slot1.kI = 0;
-    armTalonConfig.Slot1.kD = 0; // 0.02;
-    armTalonConfig.Slot1.kS = 0;
-    armTalonConfig.Slot1.kV = 0;
-    armTalonConfig.Slot1.kA = 0;
 
     // Move the arm
     armTalonConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     armTalonConfig.Slot0.kG = 0.3; // 0.35; // 0.35; // to hold the arm weight
-    armTalonConfig.Slot0.kP = 35; // 40; // 60; // 100; // adjust PID
+    armTalonConfig.Slot0.kP = 40; // 40; // 60; // 100; // adjust PID
     armTalonConfig.Slot0.kI = 0;
     armTalonConfig.Slot0.kD = 0;
     armTalonConfig.Slot0.kS = 0;
-    armTalonConfig.Slot0.kV = 8; // 10; // 8.3; // move velocity
-    armTalonConfig.Slot0.kA = 0.2; // 0.2; // move accerleration
 
-    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 50; // 1.0; // 0.5;
-    armTalonConfig.MotionMagic.MotionMagicAcceleration = 2; // 2; // 1.0;
+    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 100; // 1.0; // 0.5;
+    armTalonConfig.MotionMagic.MotionMagicAcceleration = 30; // 2; // 1.0;
     armTalonConfig.MotionMagic.MotionMagicJerk = 0; // 10; // 10;
 
     pMmPos.Slot = 0;
     pMmPos.EnableFOC = true;
-    pPos.Slot = 1;
-    pPos.EnableFOC = true;
     // Set up armTalonConfig
     tryUntilOk(5, () -> talon.getConfigurator().apply(armTalonConfig, 0.25));
 
     // ParentDevice.optimizeBusUtilizationForAll(talon);
+  }
+
+  public void manualMove(double velocity) {
+    SmartDashboard.putString("Elevator", "Manual");
+    if (velocity != 0) manuelMoving = true;
+    else manuelMoving = false;
+    talon.set(-velocity);
   }
 
   public void setVoltage(double voltage) {
@@ -131,12 +123,15 @@ public class Elevator extends SubsystemBase {
     //   }
     // } else {
     //
-    talon.setControl(pMmPos.withPosition(targetHeight / ELEVATOR_SPROCKET_PERIMETER));
+    if (!manuelMoving)
+      talon.setControl(pMmPos.withPosition(targetHeight / ELEVATOR_SPROCKET_PERIMETER));
     // }
 
     if (DriverStation.isDisabled()) {
       talon.setControl(new NeutralOut());
     }
+
+    // setElevatorHeight(getElevatorHeight());
   }
 
   public void resetPosition() {
@@ -151,6 +146,10 @@ public class Elevator extends SubsystemBase {
   public void setElevatorHeight(double setPointHeight) {
 
     targetHeight = MathUtil.clamp(setPointHeight, minHeight, maxHeight);
+  }
+
+  public double getElevatorHeight() {
+    return inputs.elevatorHeight;
   }
 
   public BooleanSupplier isDone() {
