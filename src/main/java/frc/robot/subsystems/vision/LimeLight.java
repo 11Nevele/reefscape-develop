@@ -22,7 +22,6 @@ public class LimeLight extends SubsystemBase {
   private final String limelightName = "limelight-front"; // Default name
   private static final double offset_side = -0.185;
   private static final double offset_forward = 0.42;
-  private static final double offset_forward_level5 = 0.55;
 
   // private final AprilTagFieldLayout APRILTAGFIELDLAYOUT =
   public static final AprilTagFieldLayout TAG_LAYOUT =
@@ -109,19 +108,20 @@ public class LimeLight extends SubsystemBase {
 
     LimelightHelpers.setCameraPose_RobotSpace(
         limelightName,
-        -0.30, // Forward offset (meters)
+        0.10, // Forward offset (meters)
         0, // Side offset (meters)
         0.10, // Height offset (meters)
         0.0, // Roll (degrees)
-        35.0, // Pitch (degrees)
-        180 // Yaw (degrees)
+        0.0, // Pitch (degrees)
+        0.0 // Yaw (degrees)
         );
   }
 
   @Override
   public void periodic() {
-    limeLightInputs.target_x = getTx();
-    limeLightInputs.target_y = getTy();
+    // limeLightInputs.current_r = getRobotPose().getRotation().getDegrees();
+    // limeLightInputs.current_x = getRobotPose().getX();
+    // limeLightInputs.current_y = getRobotPose().getY();
     Logger.processInputs("LimeLight", limeLightInputs);
   }
 
@@ -162,7 +162,7 @@ public class LimeLight extends SubsystemBase {
     System.out.println(getTagID());
     if (limeLightInputs.tagId != 0) {
       targetPose = APRILTAG_TARGET_POSE.get(limeLightInputs.tagId + (isLeft ? "L" : "R"));
-
+      System.out.println(limeLightInputs.tagId + (isLeft ? "L" : "R"));
       if (targetPose == null) return null;
 
       limeLightInputs.target_r = targetPose.getRotation().getDegrees();

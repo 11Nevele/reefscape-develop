@@ -160,8 +160,8 @@ public class Drive extends SubsystemBase {
 
     if (isTracking
         || (DriverStation.isAutonomous() || DriverStation.isDisabled())
-            && LimelightHelpers.getTV("limelight")) {
-      setPose(LimelightHelpers.getBotPose2d_wpiBlue("limelight"));
+            && LimelightHelpers.getTV("limelight-front")) {
+      setPose(LimelightHelpers.getBotPose2d_wpiBlue("limelight-front"));
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data

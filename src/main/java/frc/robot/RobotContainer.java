@@ -325,8 +325,11 @@ public class RobotContainer {
 
   public static PathPlannerPath GoReefTarget(Drive drive, LimeLight vision, boolean isLeft) {
 
-    if (LimelightHelpers.getTV("limelight")) { // set position based on limelight
-      drive.setPose(LimelightHelpers.getBotPose2d_wpiBlue("limelight"));
+    if (LimelightHelpers.getTV("limelight-front")) { // set position based on limelight
+      Pose2d pose = LimelightHelpers.getBotPose2d("limelight-front");
+      drive.setPose(pose);
+      System.out.println("Update Position");
+      System.out.println(pose.getX() + " " + pose.getY());
     }
 
     Pose2d targetPose2d = vision.getTargetPose2D(isLeft);
