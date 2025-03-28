@@ -17,6 +17,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PointTowardsZone;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,9 +43,13 @@ import frc.robot.subsystems.elevator.Wrist;
 import frc.robot.subsystems.intake.Shooter;
 import frc.robot.subsystems.vision.LimeLight;
 import frc.robot.subsystems.vision.LimelightHelpers;
+
 import java.util.Arrays;
 import java.util.List;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,6 +66,7 @@ public class RobotContainer {
   public final Wrist wrist;
   public final Elevator elevator;
   public final LimeLight vision;
+  public final GroundIntake groundIntake;
   public SuperStructureState currentState = SuperStructureState.STATE_SOURCE;
   public SuperStructureState targetState = SuperStructureState.STATE_SOURCE;
 
@@ -69,6 +75,7 @@ public class RobotContainer {
   public final CommandXboxController controller = new CommandXboxController(0);
   public final XboxController controller2 = new XboxController(1);
   public final CommandXboxController c_controller2 = new CommandXboxController(1);
+  public final CommandJoystick keyboard = new CommandJoystick(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -198,16 +205,6 @@ public class RobotContainer {
      * c_controller2.rightBumper().onFalse(ElevatorWristCommands.stopWrist(wrist));
      */
 
-    c_controller2.y().onTrue(ElevatorWristCommands.moveElevator(elevator, -0.5));
-    c_controller2.y().onFalse(ElevatorWristCommands.stopElevator(elevator));
-    c_controller2.a().onTrue(ElevatorWristCommands.moveElevator(elevator, 0.5));
-    c_controller2.a().onFalse(ElevatorWristCommands.stopElevator(elevator));
-
-    // manuel wrist
-    c_controller2.b().onTrue(ElevatorWristCommands.moveWrist(wrist, -1));
-    c_controller2.b().onFalse(ElevatorWristCommands.stopWrist(wrist));
-    c_controller2.x().onTrue(ElevatorWristCommands.moveWrist(wrist, 1));
-    c_controller2.x().onFalse(ElevatorWristCommands.stopWrist(wrist));
     c_controller2
         .rightTrigger()
         .toggleOnTrue(
