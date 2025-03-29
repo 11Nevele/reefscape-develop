@@ -17,7 +17,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PointTowardsZone;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,29 +26,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AlgeaCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorWristCommands;
+import frc.robot.commands.GroundIntakeCommands;
 import frc.robot.commands.IntakeCommands;
-import frc.robot.commands.SetWristAndElevator;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Wrist;
+import frc.robot.subsystems.intake.GroundIntake;
 import frc.robot.subsystems.intake.Shooter;
 import frc.robot.subsystems.vision.LimeLight;
 import frc.robot.subsystems.vision.LimelightHelpers;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -82,7 +79,6 @@ public class RobotContainer {
   public static boolean transferState = true;
   ShuffleboardTab autoSystem;
   private boolean intakeToggle = false;
-  public static boolean groundIntake = false;
 
   public Drive getDrive() {
     return drive;
@@ -96,13 +92,7 @@ public class RobotContainer {
     wrist = new Wrist();
     elevator = new Elevator();
     vision = new LimeLight();
-    NamedCommands.registerCommand("L2", new SetWristAndElevator(this, 1));
-    NamedCommands.registerCommand("L3", new SetWristAndElevator(this, 2));
-    NamedCommands.registerCommand("LH", new SetWristAndElevator(this, 5));
-    NamedCommands.registerCommand("L0", new SetWristAndElevator(this, 0));
-    NamedCommands.registerCommand("L4", new SetWristAndElevator(this, 5));
-    NamedCommands.registerCommand("L2A", new SetWristAndElevator(this, 6));
-    NamedCommands.registerCommand("L3A", new SetWristAndElevator(this, 7));
+    groundIntake = new GroundIntake();
     NamedCommands.registerCommand("Intake", IntakeCommands.intake(wrist));
     NamedCommands.registerCommand("StopIntake", IntakeCommands.stop(wrist));
     NamedCommands.registerCommand("Outake", IntakeCommands.outake(wrist));
@@ -219,7 +209,11 @@ public class RobotContainer {
                     .andThen(() -> intakeToggle = true),
                 () -> intakeToggle));
 
-    c_controller2.leftTrigger().onTrue(ElevatorWristCommands.setWristLevel(wrist, 5));
+    keyboard.button(1).onTrue(GroundIntakeCommands.setStage(groundIntake, 0));
+    keyboard.button(2).onTrue(GroundIntakeCommands.setStage(groundIntake, 1));
+
+    controller.back().onTrue(GroundIntakeCommands.intake(groundIntake));
+    controller.back().onFalse(GroundIntakeCommands.stop(groundIntake));
 
     // elevator and wrist
     /*controller
@@ -244,22 +238,29 @@ public class RobotContainer {
             ElevatorWristCommands.setWristLevel(wrist, 3)
                 .andThen(ElevatorWristCommands.setElevatorStage(elevator, 8)));
     */
-    controller.povDown().onTrue(MoveToReeftarget(true, 0, 0));
-    controller.povLeft().onTrue(MoveToReeftarget(true, 1, 1));
-    controller.povUp().onTrue(MoveToReeftarget(false, 2, 2));
-    controller.povRight().onTrue(MoveToReeftarget(false, 8, 3));
-
-    c_controller2
-        .povDown()
+    keyboard.button(18).onTrue(MoveToReeftarget(true, 0, 0));
+    keyboard.button(13).onTrue(MoveToReeftarget(true, 1, 1)); // L2 coral
+    keyboard.button(8).onTrue(MoveToReeftarget(false, 3, 3)); // L3 coral
+    keyboard
+        .button(15)
         .onTrue(
-            ElevatorWristCommands.setWristLevel(wrist, 4)
-                .andThen(ElevatorWristCommands.setElevatorStage(elevator, 6)));
-
-    c_controller2
-        .povUp()
+            ElevatorWristCommands.setElevatorStage(elevator, 5) // huamn player
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 5)));
+    keyboard
+        .button(10)
         .onTrue(
-            ElevatorWristCommands.setWristLevel(wrist, 4)
-                .andThen(ElevatorWristCommands.setElevatorStage(elevator, 7)));
+            ElevatorWristCommands.setElevatorStage(elevator, 2) // L3 Algea
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 2)));
+    keyboard
+        .button(5)
+        .onTrue(
+            ElevatorWristCommands.setElevatorStage(elevator, 4) // L3 Algea
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 4)));
+
+    keyboard.button(6).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, -1));
+    keyboard.button(6).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+    keyboard.button(7).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, 1));
+    keyboard.button(7).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
   }
 
   /**

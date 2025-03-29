@@ -38,16 +38,7 @@ public class ElevatorWristCommands {
               elevatorHeight = SuperStructureState.L4_HEIGHT;
             }
             case 5 -> {
-              elevatorHeight = SuperStructureState.HUMAN_HEIGHT;
-            }
-            case 6 -> {
-              elevatorHeight = SuperStructureState.L1B_HEIGHT;
-            }
-            case 7 -> {
-              elevatorHeight = SuperStructureState.L2B_HEIGHT;
-            }
-            case 8 -> {
-              elevatorHeight = SuperStructureState.HUMAN_HEIGHT;
+              elevatorHeight = SuperStructureState.L5_HEIGHT;
             }
           }
           elevator.setElevatorHeight(elevatorHeight);
@@ -90,21 +81,20 @@ public class ElevatorWristCommands {
           curLevel = level;
           switch (level) {
             case 0:
-              if (groundPos) wrist.setWristAngle(145); // Ground Intake
-              else wrist.setWristAngle(170);
-              groundPos = !groundPos;
+              if (groundPos) wrist.setWristAngle(130); // Ground Intake
+              else wrist.setWristAngle(100);
               break;
             case 1:
-              wrist.setWristAngle(155); // L2 //170
+              wrist.setWristAngle(137); // L2 //170
               break;
             case 2:
-              wrist.setWristAngle(155); // L3 //170
+              wrist.setWristAngle(137); // L3 //170
               break;
             case 3:
-              wrist.setWristAngle(203); // Human Player
+              wrist.setWristAngle(190); // Human Player
               break;
             case 4:
-              wrist.setWristAngle(180); // Human Player
+              wrist.setWristAngle(190); // Human Player
               break;
             case 5:
               wrist.zeroWrist();
