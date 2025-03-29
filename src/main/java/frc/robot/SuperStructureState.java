@@ -17,19 +17,26 @@ public class SuperStructureState {
   public static final double SOURCE_ANGLE = 50;
 
   public static final double L0_HEIGHT = 0.1; // default
-  public static final double L1_HEIGHT = 20; // L2 Coral
-  public static final double L2_HEIGHT = 30; // L2 Algea
-  public static final double L3_HEIGHT = 48; // L3 Coral
+  public static final double L1_HEIGHT = 9; // L2 Coral
+  public static final double L2_HEIGHT = 28; // L2 Algea
+  public static final double L3_HEIGHT = 36; // L3 Coral
   public static final double L4_HEIGHT = 48; // L3 Algea
-  public static final double L5_HEIGHT = 5; // Human Player
+  public static final double L5_HEIGHT = 3; // Human Player
 
   // intake 35
-  public static final double L0_ANGLE = 100; // defalt
-  public static final double L1_ANGLE = 137; // L2 Coral
-  public static final double L2_ANGLE = 10; // L2 Algea
-  public static final double L3_ANGLE = -30; // L3 Coral
-  public static final double L4_ANGLE = 10; // L3 Algea
-  public static final double L5_ANGLE = -100; // Human Player
+  public static final double L0_ANGLE = 144; // defalt
+  public static final double L1_ANGLE = 155; // L2 Coral
+  public static final double L2_ANGLE = 177; // L2 Algea
+  public static final double L3_ANGLE = 155; // L3 Coral
+  public static final double L4_ANGLE = 177; // L3 Algea
+  public static final double L5_ANGLE = 190; // Human Player
+  public static final double L6_ANGLE = 227; // Avoid Collsion with ground Intake
+
+  // ground intake level
+  public static final double GROUND0 = 5; // defalt
+  public static final double GROUND1 = 15; // reef and human player
+  public static final double GROUND2 = 15; // resting
+  public static final double GROUND3 = 32; // intake
 
   public double height;
   public double angle;

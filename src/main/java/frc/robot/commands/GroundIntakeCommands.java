@@ -9,13 +9,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.SuperStructureState;
 import frc.robot.subsystems.intake.GroundIntake;
 
 public class GroundIntakeCommands {
-  public static Command intake(GroundIntake groundIntake) {
+  public static Command intake(GroundIntake groundIntake, double spd) {
     return Commands.runOnce(
         () -> {
-          groundIntake.moveIntake(0.25);
+          groundIntake.moveIntake(spd);
         },
         groundIntake);
   }
@@ -41,10 +42,16 @@ public class GroundIntakeCommands {
         () -> {
           switch (stage) {
             case 0:
-              groundIntake.setWristAngle(0);
+              groundIntake.setWristAngle(SuperStructureState.GROUND0);
               break;
             case 1:
-              groundIntake.setWristAngle(100);
+              groundIntake.setWristAngle(SuperStructureState.GROUND1);
+              break;
+            case 2:
+              groundIntake.setWristAngle(SuperStructureState.GROUND2);
+              break;
+            case 3:
+              groundIntake.setWristAngle(SuperStructureState.GROUND3);
               break;
           }
         },

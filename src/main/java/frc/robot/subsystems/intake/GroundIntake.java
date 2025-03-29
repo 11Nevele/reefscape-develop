@@ -30,10 +30,10 @@ public class GroundIntake extends SubsystemBase {
   public static final double reduction =
       67.5; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
   // horizontal
-  public static final double minAngle = 15;
-  public static final double maxAngle = 30;
+  public static final double minAngle = 1;
+  public static final double maxAngle = 40;
 
-  double targetDegrees = minAngle;
+  double targetDegrees = 15;
 
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
@@ -112,6 +112,10 @@ public class GroundIntake extends SubsystemBase {
       wristMotor.set(spd * 0.15);
       manuelMoving = true;
     }
+  }
+
+  public void resetWrist() {
+    wristMotor.setPosition(0);
   }
 
   public void setWristAngle(double setPointAngle) {

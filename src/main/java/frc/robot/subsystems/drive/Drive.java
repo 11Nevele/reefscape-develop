@@ -48,6 +48,7 @@ import frc.robot.subsystems.vision.LimelightHelpers;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -155,18 +156,28 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
+  @AutoLog
+  public static class DrivePose {
+    Pose2d pose;
+  }
+
+  private final DrivePoseAutoLogged drivePose = new DrivePoseAutoLogged();
+
   @Override
   public void periodic() {
-
+    drivePose.pose = getPose();
     if (isTracking
         || (DriverStation.isAutonomous() || DriverStation.isDisabled())
             && LimelightHelpers.getTV("limelight-front")) {
-      setPose(LimelightHelpers.getBotPose2d_wpiBlue("limelight-front"));
+      Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+      pose = new Pose2d(pose.getX(), pose.getY(), pose.getRotation().unaryMinus());
+      setPose(pose);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
+    Logger.processInputs("drive pose", drivePose);
     for (var module : modules) {
       module.periodic();
     }

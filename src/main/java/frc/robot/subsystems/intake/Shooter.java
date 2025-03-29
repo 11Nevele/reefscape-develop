@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
     TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    shooterConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
+    shooterConfig.CurrentLimits.SupplyCurrentLimit = 70;
     shooterConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     transferMoter.getConfigurator().apply(shooterConfig);

@@ -81,24 +81,25 @@ public class ElevatorWristCommands {
           curLevel = level;
           switch (level) {
             case 0:
-              if (groundPos) wrist.setWristAngle(130); // Ground Intake
-              else wrist.setWristAngle(100);
+              wrist.setWristAngle(SuperStructureState.L0_ANGLE); // Ground Intake
               break;
             case 1:
-              wrist.setWristAngle(137); // L2 //170
+              wrist.setWristAngle(SuperStructureState.L1_ANGLE);
               break;
             case 2:
-              wrist.setWristAngle(137); // L3 //170
+              wrist.setWristAngle(SuperStructureState.L2_ANGLE);
               break;
             case 3:
-              wrist.setWristAngle(190); // Human Player
+              wrist.setWristAngle(SuperStructureState.L3_ANGLE);
               break;
             case 4:
-              wrist.setWristAngle(190); // Human Player
+              wrist.setWristAngle(SuperStructureState.L4_ANGLE);
               break;
             case 5:
-              wrist.zeroWrist();
+              wrist.setWristAngle(SuperStructureState.L5_ANGLE);
               break;
+            case 6:
+              wrist.setWristAngle(SuperStructureState.L6_ANGLE);
           }
         },
         wrist);

@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -64,8 +63,6 @@ public class RobotContainer {
   public final Elevator elevator;
   public final LimeLight vision;
   public final GroundIntake groundIntake;
-  public SuperStructureState currentState = SuperStructureState.STATE_SOURCE;
-  public SuperStructureState targetState = SuperStructureState.STATE_SOURCE;
 
   // Controller
   public final XboxController m_controller = new CommandXboxController(0).getHID();
@@ -155,8 +152,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> controller.getLeftX(),
             () -> -controller.getRightX()));
 
     // transfer
@@ -172,10 +169,39 @@ public class RobotContainer {
     controller.x().onFalse(AlgeaCommands.shootRev(shooter, false));
     // controller.y().onTrue(Drive.stopWithX());
     // intake
-    controller.leftBumper().onTrue(IntakeCommands.intake(wrist));
-    controller.leftBumper().onFalse(IntakeCommands.stop(wrist));
-    controller.leftTrigger().onTrue(IntakeCommands.outake(wrist));
-    controller.leftTrigger().onFalse(IntakeCommands.stop(wrist));
+    controller
+        .leftBumper()
+        .onTrue(
+            IntakeCommands.intake(wrist).andThen(GroundIntakeCommands.intake(groundIntake, -0.5)));
+    controller
+        .leftBumper()
+        .onFalse(IntakeCommands.stop(wrist).andThen(GroundIntakeCommands.stop(groundIntake)));
+    controller
+        .leftTrigger()
+        .onTrue(
+            IntakeCommands.outake(wrist).andThen(GroundIntakeCommands.intake(groundIntake, 0.5)));
+    controller
+        .leftTrigger()
+        .onFalse(IntakeCommands.stop(wrist).andThen(GroundIntakeCommands.stop(groundIntake)));
+
+    controller
+        .povDown()
+        .onTrue(
+            (ElevatorWristCommands.setWristLevel(wrist, 0))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 3)));
+    controller.povUp().onTrue(ElevatorWristCommands.setWristLevel(wrist, 6));
+    controller
+        .povLeft()
+        .onTrue(
+            ElevatorWristCommands.setElevatorStage(elevator, 2) // L3 Algea
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 2))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
+    controller
+        .povRight()
+        .onTrue(
+            ElevatorWristCommands.setElevatorStage(elevator, 4) // L3 Algea
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 4))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
 
     controller.a().onTrue(Commands.runOnce(() -> drive.resetPos()));
 
@@ -195,24 +221,7 @@ public class RobotContainer {
      * c_controller2.rightBumper().onFalse(ElevatorWristCommands.stopWrist(wrist));
      */
 
-    c_controller2
-        .rightTrigger()
-        .toggleOnTrue(
-            new ConditionalCommand(
-                (ElevatorWristCommands.moveWrist(wrist, -.5)
-                    .withTimeout(0.1)
-                    .andThen(ElevatorWristCommands.moveWrist(wrist, .5).withTimeout(0.1))
-                    .andThen(() -> intakeToggle = false)
-                    .repeatedly()),
-                ElevatorWristCommands.stopWrist(wrist)
-                    .andThen(ElevatorWristCommands.stopWrist(wrist))
-                    .andThen(() -> intakeToggle = true),
-                () -> intakeToggle));
-
-    keyboard.button(1).onTrue(GroundIntakeCommands.setStage(groundIntake, 0));
-    keyboard.button(2).onTrue(GroundIntakeCommands.setStage(groundIntake, 1));
-
-    controller.back().onTrue(GroundIntakeCommands.intake(groundIntake));
+    controller.back().onTrue(GroundIntakeCommands.intake(groundIntake, 0.5));
     controller.back().onFalse(GroundIntakeCommands.stop(groundIntake));
 
     // elevator and wrist
@@ -238,29 +247,34 @@ public class RobotContainer {
             ElevatorWristCommands.setWristLevel(wrist, 3)
                 .andThen(ElevatorWristCommands.setElevatorStage(elevator, 8)));
     */
-    keyboard.button(18).onTrue(MoveToReeftarget(true, 0, 0));
-    keyboard.button(13).onTrue(MoveToReeftarget(true, 1, 1)); // L2 coral
-    keyboard.button(8).onTrue(MoveToReeftarget(false, 3, 3)); // L3 coral
     keyboard
-        .button(15)
+        .button(17)
+        .onTrue(
+            ElevatorWristCommands.setElevatorStage(elevator, 0) // Ground Intake
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 0))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 3)));
+    keyboard.button(6).onTrue(MoveToReeftarget(true, 1, 1)); // L2 left coral
+    keyboard.button(1).onTrue(MoveToReeftarget(true, 3, 3)); // L3 left coral
+    keyboard.button(7).onTrue(MoveToReeftarget(false, 1, 1)); // L2 right coral
+    keyboard.button(2).onTrue(MoveToReeftarget(false, 3, 3)); // L3 right coral
+    keyboard
+        .button(16)
         .onTrue(
             ElevatorWristCommands.setElevatorStage(elevator, 5) // huamn player
-                .andThen(ElevatorWristCommands.setWristLevel(wrist, 5)));
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 5))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
     keyboard
-        .button(10)
+        .button(20)
         .onTrue(
-            ElevatorWristCommands.setElevatorStage(elevator, 2) // L3 Algea
-                .andThen(ElevatorWristCommands.setWristLevel(wrist, 2)));
-    keyboard
-        .button(5)
-        .onTrue(
-            ElevatorWristCommands.setElevatorStage(elevator, 4) // L3 Algea
-                .andThen(ElevatorWristCommands.setWristLevel(wrist, 4)));
+            ElevatorWristCommands.setElevatorStage(elevator, 0) // defense mode
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 6))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
 
-    keyboard.button(6).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, -1));
-    keyboard.button(6).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
-    keyboard.button(7).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, 1));
-    keyboard.button(7).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+    // manuel ground intake wrist
+    keyboard.button(3).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, -1));
+    keyboard.button(3).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+    keyboard.button(4).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, 1));
+    keyboard.button(4).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
   }
 
   /**
@@ -324,7 +338,8 @@ public class RobotContainer {
   public static PathPlannerPath GoReefTarget(Drive drive, LimeLight vision, boolean isLeft) {
 
     if (LimelightHelpers.getTV("limelight-front")) { // set position based on limelight
-      Pose2d pose = LimelightHelpers.getBotPose2d("limelight-front");
+      Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+      pose = new Pose2d(pose.getX(), pose.getY(), pose.getRotation().unaryMinus());
       drive.setPose(pose);
       System.out.println("Update Position");
       System.out.println(pose.getX() + " " + pose.getY());
@@ -348,14 +363,15 @@ public class RobotContainer {
               var path = GoReefTarget(drive, vision, isLeft);
               System.out.println("Tracking start");
               if (path != null) {
-                System.out.println("path found");
-                cmd = AutoBuilder.followPath(path);
-                drive.isTracking = true;
-                cmd.schedule();
+                // System.out.println("path found");
+                // cmd = AutoBuilder.followPath(path);
+                // drive.isTracking = true;
+                // cmd.schedule();
               }
             })
         .alongWith(ElevatorWristCommands.setElevatorStage(elevator, elevatorLevel))
         .alongWith(ElevatorWristCommands.setWristLevel(wrist, wristLevel))
+        .alongWith(GroundIntakeCommands.setStage(groundIntake, 1))
         .andThen(
             new InstantCommand(
                 () -> {
