@@ -16,19 +16,24 @@
     },
     {
       "anchor": {
-        "x": 6.0,
+        "x": 6.115453767123288,
         "y": 4.17
       },
       "prevControl": {
-        "x": 7.379760184929648,
-        "y": 4.163320468436344
+        "x": 7.122174657534247,
+        "y": 4.167744006849315
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -48,7 +53,7 @@
   "folder": "Taxi",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.42127443439227
+    "rotation": -1.547319025207622
   },
   "useDefaultConstraints": true
 }
