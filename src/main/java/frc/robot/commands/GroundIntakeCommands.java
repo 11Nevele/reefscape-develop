@@ -57,4 +57,12 @@ public class GroundIntakeCommands {
         },
         groundIntake);
   }
+
+  public static Command reset(GroundIntake groundIntake) {
+    return Commands.runOnce(
+        () -> {
+          groundIntake.resetWrist();
+        },
+        groundIntake);
+  }
 }

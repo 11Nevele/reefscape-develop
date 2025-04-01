@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeL3"
+            "name": "CoralL3"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L3"
+                  "name": "Intake"
                 }
               }
             ]
@@ -54,7 +54,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L2A"
+                  "name": "AlgeaL2"
                 }
               }
             ]

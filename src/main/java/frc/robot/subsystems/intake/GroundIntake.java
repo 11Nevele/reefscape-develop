@@ -33,7 +33,7 @@ public class GroundIntake extends SubsystemBase {
   public static final double minAngle = 1;
   public static final double maxAngle = 40;
 
-  double targetDegrees = 15;
+  double targetDegrees = 35;
 
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
@@ -53,13 +53,13 @@ public class GroundIntake extends SubsystemBase {
     // Move the arm
     armTalonConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     armTalonConfig.Slot0.kG = 0.1; // 0.35; // to hold the arm weight
-    armTalonConfig.Slot0.kP = 50; // 60; // 100; // adjust PID
+    armTalonConfig.Slot0.kP = 60; // 60; // 100; // adjust PID
     armTalonConfig.Slot0.kI = 0;
     armTalonConfig.Slot0.kD = 1;
     armTalonConfig.Slot0.kS = 0;
 
-    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 8; // 1.0; // 0.5;
-    armTalonConfig.MotionMagic.MotionMagicAcceleration = 2; // 2; // 1.0;
+    armTalonConfig.MotionMagic.MotionMagicCruiseVelocity = 20; // 1.0; // 0.5;
+    armTalonConfig.MotionMagic.MotionMagicAcceleration = 10; // 2; // 1.0;
     armTalonConfig.MotionMagic.MotionMagicJerk = 20; // 10; // 10;
 
     pMmPos.Slot = 0;

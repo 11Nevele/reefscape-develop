@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
   private final TalonFX transferMoter;
@@ -42,12 +43,16 @@ public class Shooter extends SubsystemBase {
 
     rightShooter = new TalonFX(13, TunerConstants.kCANBus);
     leftShooter = new TalonFX(14, TunerConstants.kCANBus);
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    rightShooter.getConfigurator().apply(config);
+    leftShooter.getConfigurator().apply(config);
   }
 
   @Override
   public void periodic() {
     inputs.leftRotationSpeed = leftShooter.getVelocity().getValueAsDouble();
     inputs.rightRotationSpeed = rightShooter.getVelocity().getValueAsDouble();
+    Logger.processInputs("Shooter", inputs);
   }
 
   public void shoot(boolean moveShooter) {

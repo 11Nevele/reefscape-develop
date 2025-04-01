@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -21,4 +22,8 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  public default Pigeon2 getGyro() {
+    return null;
+  }
 }

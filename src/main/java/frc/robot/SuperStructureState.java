@@ -17,9 +17,9 @@ public class SuperStructureState {
   public static final double SOURCE_ANGLE = 50;
 
   public static final double L0_HEIGHT = 0.1; // default
-  public static final double L1_HEIGHT = 9; // L2 Coral
+  public static final double L1_HEIGHT = 12; // L2 Coral
   public static final double L2_HEIGHT = 28; // L2 Algea
-  public static final double L3_HEIGHT = 36; // L3 Coral
+  public static final double L3_HEIGHT = 39; // L3 Coral
   public static final double L4_HEIGHT = 48; // L3 Algea
   public static final double L5_HEIGHT = 3; // Human Player
 

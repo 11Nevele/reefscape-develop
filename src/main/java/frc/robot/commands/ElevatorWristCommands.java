@@ -58,7 +58,7 @@ public class ElevatorWristCommands {
     return Commands.runOnce(
         () -> {
           elevator.manualMove(0);
-          elevator.setElevatorHeight(elevator.getElevatorHeight() + 1);
+          elevator.setElevatorHeight(elevator.getElevatorHeight());
         },
         elevator);
   }

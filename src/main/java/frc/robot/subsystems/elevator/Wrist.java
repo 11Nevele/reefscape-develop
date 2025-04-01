@@ -27,6 +27,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.SuperStructureState;
 import frc.robot.generated.TunerConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLog;
@@ -46,7 +47,7 @@ public class Wrist extends SubsystemBase {
   public static final double minAngle = 60;
   public static final double maxAngle = 270;
 
-  double targetDegrees = minAngle;
+  double targetDegrees = SuperStructureState.L0_ANGLE;
   private boolean manuelMoving = false;
 
   @AutoLog

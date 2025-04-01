@@ -22,6 +22,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,16 +45,16 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.vision.LimeLight;
 import frc.robot.subsystems.vision.LimelightHelpers;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  public boolean isTracking = false;
+
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -67,7 +68,7 @@ public class Drive extends SubsystemBase {
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = 50.088;
+  private static final double ROBOT_MASS_KG = 45.088;
   private static final double ROBOT_MOI = 6.883;
   private static final double WHEEL_COF = 1.2;
   private static final RobotConfig PP_CONFIG =
@@ -104,6 +105,8 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
+  public boolean isTracking = false;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -129,7 +132,7 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(8.5, 0.0, 0.0), new PIDConstants(6.0, 0.0, 0.0)), // 8.5
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -156,28 +159,20 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-  @AutoLog
-  public static class DrivePose {
-    Pose2d pose;
-  }
-
-  private final DrivePoseAutoLogged drivePose = new DrivePoseAutoLogged();
-
   @Override
   public void periodic() {
-    drivePose.pose = getPose();
-    if (isTracking
-        || (DriverStation.isAutonomous() || DriverStation.isDisabled())
-            && LimelightHelpers.getTV("limelight-front")) {
-      Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-      pose = new Pose2d(pose.getX(), pose.getY(), pose.getRotation().unaryMinus());
-      setPose(pose);
+    if (DriverStation.isDisabled()
+        && DriverStation.isAutonomous()
+        && LimelightHelpers.getTV(LimeLight.limelightName)) {
+      estimatePose();
+    } else if (LimelightHelpers.getTV(LimeLight.limelightName)) {
+      // use magtagII for auton & auto alignment
+      estimatePose();
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    Logger.processInputs("drive pose", drivePose);
     for (var module : modules) {
       module.periodic();
     }
@@ -188,6 +183,12 @@ public class Drive extends SubsystemBase {
       for (var module : modules) {
         module.stop();
       }
+    }
+
+    // Log empty setpoint states when disabled
+    if (DriverStation.isDisabled()) {
+      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
     // Update odometry
@@ -375,7 +376,66 @@ public class Drive extends SubsystemBase {
     };
   }
 
-  public void resetPos() {
-    poseEstimator.resetPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  // // Assuming this is a method in your drive subsystem
+  // public Command followPathCommand(String pathName) {
+  //   try{
+  //       PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+  //       RobotConfig robotConfig=RobotConfig.fromGUISettings();
+  //       return new FollowPathCommand(
+  //               path,
+  //               this::getPose, // Robot pose supplier
+  //               this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+  //               this::drive, // Method that will drive the robot given ROBOT RELATIVE
+  // ChassisSpeeds, AND feedforwards
+  //               new PPHolonomicDriveController( // PPHolonomicController is the built in path
+  // following controller for holonomic drive trains
+  //                       new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+  //                       new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+  //               ),
+  //               PP_CONFIG, // The robot configuration
+  //               () -> {
+  //                 // Boolean supplier that controls when the path will be mirrored for the red
+  // alliance
+  //                 // This will flip the path being followed to the red side of the field.
+  //                 // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+  //                 var alliance = DriverStation.getAlliance();
+  //                 if (alliance.isPresent()) {
+  //                   return alliance.get() == DriverStation.Alliance.Red;
+  //                 }
+  //                 return false;
+  //               },
+  //               this // Reference to this subsystem to set requirements
+  //       );
+  //   } catch (Exception e) {
+  //       DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+  //       return Commands.none();
+  //   }
+  // }
+  public void estimatePose() {
+
+    boolean doRejectUpdate = false;
+    LimelightHelpers.SetRobotOrientation(
+        LimeLight.limelightName,
+        poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
+        0,
+        0,
+        0,
+        0,
+        0);
+    LimelightHelpers.PoseEstimate mt2 =
+        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LimeLight.limelightName);
+    // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+    if (Math.abs(gyroIO.getGyro().getAngularVelocityZWorld().getValueAsDouble()) > 360) {
+      doRejectUpdate = true;
+    }
+    if (mt2.tagCount == 0) {
+      doRejectUpdate = true;
+    }
+    if (!doRejectUpdate) {
+      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0, 0, Double.MAX_VALUE));
+      poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+      System.out.println("Estimate Pose");
+    }
   }
 }

@@ -35,9 +35,9 @@ public class Elevator extends SubsystemBase {
       Units.inchesToMeters(2.472433418375167278670100342641) * 100; // inches
   private static final double POS_SWITCH_THRESHOLD = 2;
   public static final double minHeight = 0;
-  public static final double maxHeight = 60;
+  public static final double maxHeight = 50;
 
-  double targetHeight = SuperStructureState.SOURCE_HEIGHT;
+  double targetHeight = SuperStructureState.L0_HEIGHT;
 
   // Hardware
   private final TalonFX talon;
@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putString("Elevator", "Manual");
     if (velocity != 0) manuelMoving = true;
     else manuelMoving = false;
-    talon.set(-velocity);
+    talon.set(velocity);
   }
 
   public void setVoltage(double voltage) {

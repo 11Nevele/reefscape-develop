@@ -54,6 +54,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  public static final boolean USEMAG2 = false;
   // Subsystems
   private final Drive drive;
   // private final LimeLight vision;
@@ -93,12 +94,35 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake", IntakeCommands.intake(wrist));
     NamedCommands.registerCommand("StopIntake", IntakeCommands.stop(wrist));
     NamedCommands.registerCommand("Outake", IntakeCommands.outake(wrist));
-    NamedCommands.registerCommand("IntakeL2", ElevatorWristCommands.setWristLevel(wrist, 1));
-    NamedCommands.registerCommand("IntakeL3", ElevatorWristCommands.setWristLevel(wrist, 2));
-    NamedCommands.registerCommand("IntakeL4", ElevatorWristCommands.setWristLevel(wrist, 2));
-    NamedCommands.registerCommand("IntakeHuman", ElevatorWristCommands.setWristLevel(wrist, 3));
-    NamedCommands.registerCommand("IntakeAlgae", ElevatorWristCommands.setWristLevel(wrist, 4));
-    NamedCommands.registerCommand("Flywheel", AlgeaCommands.shoot(shooter, true));
+    NamedCommands.registerCommand(
+        "CoralL2",
+        ElevatorWristCommands.setElevatorStage(elevator, 1) // huamn player
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 1))
+            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+    NamedCommands.registerCommand(
+        "CoralL3",
+        ElevatorWristCommands.setElevatorStage(elevator, 3) // huamn player
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 3))
+            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+    NamedCommands.registerCommand(
+        "IntakeHuman",
+        ElevatorWristCommands.setElevatorStage(elevator, 5) // huamn player
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 5))
+            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+    NamedCommands.registerCommand(
+        "AlgeaL2",
+        ElevatorWristCommands.setElevatorStage(elevator, 2) // L3 Algea
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 2))
+            .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
+
+    NamedCommands.registerCommand(
+        "Transfer",
+        GroundIntakeCommands.intake(groundIntake, 0.5)
+            .alongWith(AlgeaCommands.Transfer(shooter, 0.5)));
+    NamedCommands.registerCommand(
+        "StopTransfer",
+        GroundIntakeCommands.intake(groundIntake, 0.0)
+            .alongWith(AlgeaCommands.Transfer(shooter, 0.0)));
 
     // Real robot, instantiate hardware IO implementations
     // vision = new LimeLight();
@@ -152,8 +176,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftY(),
-            () -> controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
     // transfer
@@ -188,7 +212,8 @@ public class RobotContainer {
         .povDown()
         .onTrue(
             (ElevatorWristCommands.setWristLevel(wrist, 0))
-                .andThen(GroundIntakeCommands.setStage(groundIntake, 3)));
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 3))
+                .andThen(ElevatorWristCommands.setElevatorStage(elevator, 0)));
     controller.povUp().onTrue(ElevatorWristCommands.setWristLevel(wrist, 6));
     controller
         .povLeft()
@@ -203,7 +228,7 @@ public class RobotContainer {
                 .andThen(ElevatorWristCommands.setWristLevel(wrist, 4))
                 .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
 
-    controller.a().onTrue(Commands.runOnce(() -> drive.resetPos()));
+    controller.a().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d())));
 
     /*
      * // manuel elevator
@@ -223,6 +248,8 @@ public class RobotContainer {
 
     controller.back().onTrue(GroundIntakeCommands.intake(groundIntake, 0.5));
     controller.back().onFalse(GroundIntakeCommands.stop(groundIntake));
+    controller.start().onTrue(MoveToReeftarget(true, 0, 0));
+    // controller.start().onFalse(GroundIntakeCommands.stop(groundIntake));
 
     // elevator and wrist
     /*controller
@@ -271,10 +298,23 @@ public class RobotContainer {
                 .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
 
     // manuel ground intake wrist
-    keyboard.button(3).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, -1));
-    keyboard.button(3).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
-    keyboard.button(4).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, 1));
-    keyboard.button(4).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+    keyboard.button(8).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, -1));
+    keyboard.button(8).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+    keyboard.button(13).onTrue(GroundIntakeCommands.manuelWrist(groundIntake, 1));
+    keyboard.button(13).onFalse(GroundIntakeCommands.manuelWrist(groundIntake, 0));
+
+    keyboard.button(3).onTrue(GroundIntakeCommands.reset(groundIntake));
+
+    // manuel wrist
+    keyboard.button(9).onTrue(ElevatorWristCommands.moveElevator(elevator, 1));
+    keyboard.button(9).onFalse(ElevatorWristCommands.stopElevator(elevator));
+    keyboard.button(14).onTrue(ElevatorWristCommands.moveElevator(elevator, -1));
+    keyboard.button(14).onFalse(ElevatorWristCommands.stopElevator(elevator));
+
+    keyboard.button(10).onTrue(ElevatorWristCommands.moveWrist(wrist, 1));
+    keyboard.button(10).onFalse(ElevatorWristCommands.stopWrist(wrist));
+    keyboard.button(15).onTrue(ElevatorWristCommands.moveWrist(wrist, -1));
+    keyboard.button(15).onFalse(ElevatorWristCommands.stopWrist(wrist));
   }
 
   /**
@@ -338,11 +378,7 @@ public class RobotContainer {
   public static PathPlannerPath GoReefTarget(Drive drive, LimeLight vision, boolean isLeft) {
 
     if (LimelightHelpers.getTV("limelight-front")) { // set position based on limelight
-      Pose2d pose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-      pose = new Pose2d(pose.getX(), pose.getY(), pose.getRotation().unaryMinus());
-      drive.setPose(pose);
-      System.out.println("Update Position");
-      System.out.println(pose.getX() + " " + pose.getY());
+      drive.estimatePose();
     }
 
     Pose2d targetPose2d = vision.getTargetPose2D(isLeft);
@@ -364,9 +400,9 @@ public class RobotContainer {
               System.out.println("Tracking start");
               if (path != null) {
                 // System.out.println("path found");
-                // cmd = AutoBuilder.followPath(path);
-                // drive.isTracking = true;
-                // cmd.schedule();
+                cmd = AutoBuilder.followPath(path);
+                drive.isTracking = true;
+                cmd.schedule();
               }
             })
         .alongWith(ElevatorWristCommands.setElevatorStage(elevator, elevatorLevel))
