@@ -7,9 +7,6 @@
 
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -21,13 +18,14 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.elevator.WristIOInputsAutoLogged;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class GroundIntake extends SubsystemBase {
   private TalonFX wristMotor;
@@ -40,7 +38,7 @@ public class GroundIntake extends SubsystemBase {
   public static final double minAngle = 1;
   public static final double maxAngle = 40;
 
-  double targetDegrees = 35;
+  double targetDegrees = 75;
 
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
