@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.501174055608211,
-        "y": 7.092512615789923
+        "x": 6.8578898382078055,
+        "y": 7.066387360384635
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.756,
-        "y": 5.610209760273973
+        "x": 3.801,
+        "y": 5.550107020547944
       },
       "prevControl": {
-        "x": 4.32350279041402,
-        "y": 6.593153426708166
+        "x": 4.317899366719519,
+        "y": 5.8541430019103675
       },
       "nextControl": null,
       "isLocked": false,
@@ -37,7 +37,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.85,
+      "minWaypointRelativePos": 0.9068322981366468,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -67,7 +67,7 @@
   "folder": "Alliance Side",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -124.99972970037636
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

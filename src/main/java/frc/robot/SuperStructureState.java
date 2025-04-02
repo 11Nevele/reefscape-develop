@@ -18,8 +18,8 @@ public class SuperStructureState {
 
   public static final double L0_HEIGHT = 0.1; // default
   public static final double L1_HEIGHT = 12; // L2 Coral
-  public static final double L2_HEIGHT = 28; // L2 Algea
-  public static final double L3_HEIGHT = 39; // L3 Coral
+  public static final double L2_HEIGHT = 24; // L2 Algea
+  public static final double L3_HEIGHT = 40; // L3 Coral
   public static final double L4_HEIGHT = 48; // L3 Algea
   public static final double L5_HEIGHT = 3; // Human Player
 
@@ -34,7 +34,7 @@ public class SuperStructureState {
 
   // ground intake level
   public static final double GROUND0 = 5; // defalt
-  public static final double GROUND1 = 15; // reef and human player
+  public static final double GROUND1 = 20; // reef and human player
   public static final double GROUND2 = 15; // resting
   public static final double GROUND3 = 32; // intake
 

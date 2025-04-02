@@ -48,15 +48,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "NonAllianceAlgea1"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "AlgeaL2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NonAllianceAlgea1"
           }
         },
         {

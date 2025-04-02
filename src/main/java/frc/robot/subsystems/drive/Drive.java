@@ -164,6 +164,11 @@ public class Drive extends SubsystemBase {
     if (DriverStation.isDisabled()
         && DriverStation.isAutonomous()
         && LimelightHelpers.getTV(LimeLight.limelightName)) {
+      LimelightHelpers.PoseEstimate mt1 =
+          LimelightHelpers.getBotPoseEstimate_wpiBlue(LimeLight.limelightName);
+      this.addVisionMeasurement(
+          mt1.pose, mt1.timestampSeconds, VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, 0.7));
+
       estimatePose();
     } else if (LimelightHelpers.getTV(LimeLight.limelightName)) {
       // use magtagII for auton & auto alignment

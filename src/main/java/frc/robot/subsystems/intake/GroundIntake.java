@@ -115,6 +115,7 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void resetWrist() {
+    targetDegrees = 0;
     wristMotor.setPosition(0);
   }
 

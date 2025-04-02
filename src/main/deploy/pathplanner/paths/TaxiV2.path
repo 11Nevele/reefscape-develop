@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
+        "x": 7.257405821917809,
         "y": 4.17
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.9180973622024995,
-        "y": 4.148575572205515
+        "x": 6.506038166762552,
+        "y": 4.203007252552191
       },
       "isLocked": false,
       "linkedName": null
@@ -20,20 +20,15 @@
         "y": 4.17
       },
       "prevControl": {
-        "x": 7.122174657534247,
-        "y": 4.167744006849315
+        "x": 7.030869766910871,
+        "y": 4.128807412438704
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -47,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 178.40885972880542
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Taxi",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -1.547319025207622
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
