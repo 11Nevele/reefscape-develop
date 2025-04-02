@@ -4,24 +4,24 @@
     {
       "anchor": {
         "x": 3.756,
-        "y": 5.119
+        "y": 5.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8865031009584037,
-        "y": 5.774751761005517
+        "x": 3.3389791183294664,
+        "y": 5.470533642691415
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.472,
-        "y": 6.998108552631579
+        "x": 1.352,
+        "y": 6.948
       },
       "prevControl": {
-        "x": 2.1502708278011347,
-        "y": 6.4655728765873315
+        "x": 2.030270827801135,
+        "y": 6.415464323955753
       },
       "nextControl": null,
       "isLocked": false,
@@ -51,7 +51,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 96.36111907317773
+    "rotation": 130.0
   },
   "reversed": false,
   "folder": "Alliance Side",

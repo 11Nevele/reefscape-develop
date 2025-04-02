@@ -52,15 +52,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Blue Coral 2 - Algae"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "AlgeaL2"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Blue Coral 2 - Algae"
                 }
               }
             ]
