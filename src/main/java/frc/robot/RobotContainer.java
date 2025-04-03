@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -96,32 +97,27 @@ public class RobotContainer {
     NamedCommands.registerCommand("Outake", IntakeCommands.outake(wrist));
     NamedCommands.registerCommand(
         "CoralL2",
-        // ElevatorWristCommands.setElevatorStage(elevator, 1) // huamn player
-        //     .andThen(ElevatorWristCommands.setWristLevel(wrist, 1))
-        //     .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
-        GroundIntakeCommands.setStage(groundIntake, 0)
-            .andThen(Commands.waitSeconds(0.25))
-            .andThen(ElevatorWristCommands.setElevatorStage(elevator, 1))
-            .andThen(ElevatorWristCommands.setWristLevel(wrist, 1)));
+        ElevatorWristCommands.setElevatorStage(elevator, 1) // huamn player
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 1))
+            .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
     NamedCommands.registerCommand(
         "CoralL3",
-        // ElevatorWristCommands.setElevatorStage(elevator, 3) // huamn player
-        //     .andThen(ElevatorWristCommands.setWristLevel(wrist, 3))
-        //     .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
-        GroundIntakeCommands.setStage(groundIntake, 0)
-            .andThen(Commands.waitSeconds(0.25))
+        GroundIntakeCommands.setStage(groundIntake, 1)
+            .andThen(new WaitCommand(0.3))
             .andThen(ElevatorWristCommands.setElevatorStage(elevator, 3))
             .andThen(ElevatorWristCommands.setWristLevel(wrist, 3)));
     NamedCommands.registerCommand(
         "IntakeHuman",
-        ElevatorWristCommands.setElevatorStage(elevator, 5) // huamn player
+        GroundIntakeCommands.setStage(groundIntake, 1)
+            .andThen(new WaitCommand(0.3))
             .andThen(ElevatorWristCommands.setWristLevel(wrist, 5))
-            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+            .andThen(ElevatorWristCommands.setElevatorStage(elevator, 5)));
     NamedCommands.registerCommand(
         "AlgeaL2",
-        ElevatorWristCommands.setElevatorStage(elevator, 2) // L3 Algea
+        GroundIntakeCommands.setStage(groundIntake, 1)
+            // L3 Algea
             .andThen(ElevatorWristCommands.setWristLevel(wrist, 2))
-            .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
+            .andThen(ElevatorWristCommands.setElevatorStage(elevator, 2)));
 
     NamedCommands.registerCommand(
         "Transfer",
@@ -186,7 +182,10 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> {
+              return -Math.pow(controller.getRightX(), 2) * 0.8;
+              // return  controller.getRightX() * 0.8;
+            }));
 
     // transfer
     controller.rightBumper().onTrue(AlgeaCommands.Transfer(shooter, 0.5));
@@ -219,8 +218,9 @@ public class RobotContainer {
     controller
         .povDown()
         .onTrue(
-            (ElevatorWristCommands.setWristLevel(wrist, 0))
-                .andThen(GroundIntakeCommands.setStage(groundIntake, 3))
+            GroundIntakeCommands.setStage(groundIntake, 3)
+                .andThen(new WaitCommand(0.5))
+                .andThen((ElevatorWristCommands.setWristLevel(wrist, 0)))
                 .andThen(ElevatorWristCommands.setElevatorStage(elevator, 0)));
     controller.povUp().onTrue(ElevatorWristCommands.setWristLevel(wrist, 6));
     controller

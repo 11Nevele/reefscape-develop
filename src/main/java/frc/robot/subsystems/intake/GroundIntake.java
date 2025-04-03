@@ -64,7 +64,7 @@ public class GroundIntake extends SubsystemBase {
     CANcoderConfiguration wristCanCoderConfig = new CANcoderConfiguration();
     wristCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     wristCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-    wristCanCoderConfig.MagnetSensor.MagnetOffset = 0.107178;
+    wristCanCoderConfig.MagnetSensor.MagnetOffset = -0.88; // -0.74975; // 0.107178
 
     wristEncoder.getConfigurator().apply(wristCanCoderConfig);
 
