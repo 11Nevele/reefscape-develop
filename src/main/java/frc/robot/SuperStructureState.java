@@ -38,6 +38,8 @@ public class SuperStructureState {
   public static final double GROUND2 = 50; // resting
   public static final double GROUND3 = 70; // intake
 
+  //test test
+
   public double height;
   public double angle;
   public String name;
