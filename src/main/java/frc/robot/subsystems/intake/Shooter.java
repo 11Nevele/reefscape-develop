@@ -21,6 +21,7 @@ public class Shooter extends SubsystemBase {
 
   private final TalonFX leftShooter;
   private final TalonFX rightShooter;
+  public static final double shooterSpeed = 1;
 
   @AutoLog
   public static class ShooterIOInputs {
@@ -57,8 +58,8 @@ public class Shooter extends SubsystemBase {
 
   public void shoot(boolean moveShooter) {
     if (moveShooter) {
-      rightShooter.set(-1);
-      leftShooter.set(1);
+      rightShooter.set(-shooterSpeed);
+      leftShooter.set(shooterSpeed);
     } else {
       rightShooter.setVoltage(0);
       leftShooter.setVoltage(0);
