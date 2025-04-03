@@ -38,7 +38,7 @@ public class SuperStructureState {
   public static final double GROUND2 = 50; // resting
   public static final double GROUND3 = 70; // intake
 
-  //test test
+  // test test
 
   public double height;
   public double angle;

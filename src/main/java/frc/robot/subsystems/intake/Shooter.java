@@ -21,7 +21,7 @@ public class Shooter extends SubsystemBase {
 
   private final TalonFX leftShooter;
   private final TalonFX rightShooter;
-  public static final double shooterSpeed = 1;
+  public static final double shooterSpeed = 0.95;
 
   @AutoLog
   public static class ShooterIOInputs {

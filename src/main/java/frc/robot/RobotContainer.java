@@ -96,14 +96,22 @@ public class RobotContainer {
     NamedCommands.registerCommand("Outake", IntakeCommands.outake(wrist));
     NamedCommands.registerCommand(
         "CoralL2",
-        ElevatorWristCommands.setElevatorStage(elevator, 1) // huamn player
-            .andThen(ElevatorWristCommands.setWristLevel(wrist, 1))
-            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+        // ElevatorWristCommands.setElevatorStage(elevator, 1) // huamn player
+        //     .andThen(ElevatorWristCommands.setWristLevel(wrist, 1))
+        //     .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+        GroundIntakeCommands.setStage(groundIntake, 0)
+            .andThen(Commands.waitSeconds(0.25))
+            .andThen(ElevatorWristCommands.setElevatorStage(elevator, 1))
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 1)));
     NamedCommands.registerCommand(
         "CoralL3",
-        ElevatorWristCommands.setElevatorStage(elevator, 3) // huamn player
-            .andThen(ElevatorWristCommands.setWristLevel(wrist, 3))
-            .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+        // ElevatorWristCommands.setElevatorStage(elevator, 3) // huamn player
+        //     .andThen(ElevatorWristCommands.setWristLevel(wrist, 3))
+        //     .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
+        GroundIntakeCommands.setStage(groundIntake, 0)
+            .andThen(Commands.waitSeconds(0.25))
+            .andThen(ElevatorWristCommands.setElevatorStage(elevator, 3))
+            .andThen(ElevatorWristCommands.setWristLevel(wrist, 3)));
     NamedCommands.registerCommand(
         "IntakeHuman",
         ElevatorWristCommands.setElevatorStage(elevator, 5) // huamn player
