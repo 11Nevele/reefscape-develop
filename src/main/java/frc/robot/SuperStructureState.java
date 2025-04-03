@@ -36,7 +36,7 @@ public class SuperStructureState {
   public static final double GROUND0 = 10; // defalt
   public static final double GROUND1 = 50; // reef and human player
   public static final double GROUND2 = 50; // resting
-  public static final double GROUND3 = 75; // intake
+  public static final double GROUND3 = 70; // intake
 
   public double height;
   public double angle;

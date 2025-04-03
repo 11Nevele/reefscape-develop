@@ -36,9 +36,9 @@ public class GroundIntake extends SubsystemBase {
       67.5; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
   // horizontal
   public static final double minAngle = 1;
-  public static final double maxAngle = 40;
+  public static final double maxAngle = 100;
 
-  double targetDegrees = 75;
+  double targetDegrees = 50;
 
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
