@@ -183,8 +183,9 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> {
-              return -Math.pow(controller.getRightX(), 2) * 0.8;
-              // return  controller.getRightX() * 0.8;
+              double currPower = controller.getRightX();
+              // return -Math.pow(controller.getRightX(), 2) * 0.8;
+              return currPower * Math.abs(currPower) * 0.8;
             }));
 
     // transfer
@@ -235,6 +236,12 @@ public class RobotContainer {
             ElevatorWristCommands.setElevatorStage(elevator, 4) // L3 Algea
                 .andThen(ElevatorWristCommands.setWristLevel(wrist, 4))
                 .andThen(GroundIntakeCommands.setStage(groundIntake, 1)));
+    controller
+        .povUp()
+        .onTrue(
+            ElevatorWristCommands.setElevatorStage(elevator, 0) // defense mode
+                .andThen(ElevatorWristCommands.setWristLevel(wrist, 6))
+                .andThen(GroundIntakeCommands.setStage(groundIntake, 0)));
 
     controller.a().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d())));
 
