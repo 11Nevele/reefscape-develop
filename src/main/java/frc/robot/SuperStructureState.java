@@ -33,10 +33,10 @@ public class SuperStructureState {
   public static final double L6_ANGLE = 227; // Avoid Collsion with ground Intake
 
   // ground intake level
-  public static final double GROUND0 = 5; // defalt
-  public static final double GROUND1 = 25; // reef and human player
-  public static final double GROUND2 = 25; // resting
-  public static final double GROUND3 = 35; // intake
+  public static final double GROUND0 = -2.5; // defalt
+  public static final double GROUND1 = 10; // reef and human player
+  public static final double GROUND2 = 5; // resting
+  public static final double GROUND3 = 17.5; // intake
 
   // test test
 

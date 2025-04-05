@@ -7,9 +7,6 @@
 
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -18,18 +15,19 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.elevator.WristIOInputsAutoLogged;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class GroundIntake extends SubsystemBase {
   private TalonFX wristMotor;
   private TalonFX intakeMotor;
-  //private CANcoder wristEncoder;
+  // private CANcoder wristEncoder;
 
   public static final double reduction =
       67.5; // wrist gearbox gear ration 60.0 * 60.0 * 30.0 / (10.0 * 18.0 * 12.0)
@@ -42,7 +40,7 @@ public class GroundIntake extends SubsystemBase {
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0);
 
   public GroundIntake() {
-   // wristEncoder = new CANcoder(30, TunerConstants.kCANBus);
+    // wristEncoder = new CANcoder(30, TunerConstants.kCANBus);
     wristMotor = new TalonFX(25, TunerConstants.kCANBus);
     intakeMotor = new TalonFX(26, TunerConstants.kCANBus);
 
@@ -60,12 +58,12 @@ public class GroundIntake extends SubsystemBase {
     // Set up armTalonConfig
     intakeMotor.getConfigurator().apply(intakeConfig, 0.25);
     TalonFXConfiguration wristConfigure = new TalonFXConfiguration();
-    //CANcoderConfiguration wristCanCoderConfig = new CANcoderConfiguration();
-    //wristCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    //wristCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-    //wristCanCoderConfig.MagnetSensor.MagnetOffset = -0.88 - 1; // -0.74975; // 0.107178//-.88
+    // CANcoderConfiguration wristCanCoderConfig = new CANcoderConfiguration();
+    // wristCanCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    // wristCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+    // wristCanCoderConfig.MagnetSensor.MagnetOffset = -0.88 - 1; // -0.74975; // 0.107178//-.88
 
-    //wristEncoder.getConfigurator().apply(wristCanCoderConfig);
+    // wristEncoder.getConfigurator().apply(wristCanCoderConfig);
 
     wristConfigure.CurrentLimits.SupplyCurrentLimit = 50.0;
     wristConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;

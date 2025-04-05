@@ -185,7 +185,7 @@ public class RobotContainer {
             () -> {
               double currPower = controller.getRightX();
               // return -Math.pow(controller.getRightX(), 2) * 0.8;
-              return currPower * Math.abs(currPower) * 0.8;
+              return -currPower * Math.abs(currPower) * 0.8;
             }));
 
     // transfer
